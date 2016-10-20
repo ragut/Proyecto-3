@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SmarhTool</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{static_url('vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="{{static_url('css/clean-blog.min.css')}}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{{static_url('vendor/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script type="text/javascript" src="/jwplayer/src/js/jwplayer.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="/">SmartTools</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">HOME</a>
+                    </li>
+                    {% if login is True %}
+                    <li>
+                        <a href="/admin">ADMIN</a>
+                    </li>
+                    <li>
+                        <a href="/logout">LOGOUT</a>
+                    </li>
+                    {% end %}
+                                  
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image:url({{static_url('data/banner/'+contest.banner)}})">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h1>Contest {{contest.names}}</h1>
+                        <hr class="small">                      
+                        <span class="subheading">
+                            <p style="color: white; font-weight: bold">{{contest.description}}</p>
+                            <p style="color: white; font-weight: bold">Begin: {{contest.date_ini.strftime("%d/%m/%Y")}}</p>
+                            <p style="color: white; font-weight: bold">   Deadline: {{contest.deadline.strftime("%d/%m/%Y")}}</p>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+	
+	<!-- Main Content -->
+    <div class="container">
+         <div class="row" style="margin-top: 10px">
+			<div class="col-md-3 pull-right">
+				<a href="/video/new?user={{contest.user_id}}&contest={{contest.id}}" class="btn btn-xl"><i class="fa fa-plus-circle"></i>Create Video</a>
+			</div>
+		</div>
+		
+		<div class="row" style="margin-top: 10px">
+                {% if len(videos) == 0%}
+                <h3>There is no videos for this contest, please add a new video</h3>
+                {% else %}
+                <h3>Current videos</h3>
+                <table id="contestTable" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%"">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%">Name video</th>
+                            <th style="width: 30%">email</th>
+                            <th style="width: 40%">User</th>
+                            <th style="width: 10%">Date</th>
+                            <th style="width: 10%">Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for video in videos%}
+                    <tr style="border: 1px solid #ddd;">
+                        <td>{{video.video_name}}</td>
+                        <td>{{video.email}}</td>
+                        <td>{{video.names_user}} {{video.lastnames_user}}</td>
+						<td>{{video.date}}</td>
+						<td>{{video.status}}</td>
+
+                         <td class="pull-right" style="border: 0px">
+                            <a href="{{static_url('data/original/'+video.video_name+'.'+video.original_file)}}" onclick="NewWindow(this.href,'name','400','400','yes');return false"><i class="fa fa-eye fa-lg"></i></a>
+                            {% if video.status == "OK" %}
+                             <a href="{{static_url('data/converted/'+video.video_name+'.mp4')}}" onclick="NewWindow(this.href,'name','400','400','yes');return false"><i class="fa fa-pencil fa-lg"></i></a>
+                            {% end %}
+                        </td>
+                    </tr>
+                    {% end %}
+                    </tbody>
+                </table>
+                {% end %}
+            </div>
+    </div>
+
+	<hr>
+
+    <!-- Footer -->
+    <footer style="padding: 0px">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Cloud Computing - Universidad de los Andes</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src={{static_url('vendor/jquery/jquery.min.js')}}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src={{static_url('vendor/bootstrap/js/bootstrap.min.js')}}"></script>
+
+    
+
+    <!-- Theme JavaScript -->
+    <script src={{static_url('js/clean-blog.min.js')}}"></script>
+	<!-- Contact Form JavaScript -->
+    <script src={{static_url('js/validator.min.js')}}"></script>
+    <!-- Custom Theme JavaScript -->
+    <script>
+        $(document).ready(function() {
+            $('#contestTable').DataTable();
+        } );
+    </script>
+    <script language="javascript">
+        var win = null;
+        function NewWindow(mypage,myname,w,h,scroll){
+        LeftPosition = (screen.width) ? (screen.width-w)/2 : 0;
+        TopPosition = (screen.height) ? (screen.height-h)/2 : 0;
+        settings =
+        'height='+h+',width='+w+',top='+TopPosition+',left='+LeftPosition+',scrollbars='+scroll+',resizable'
+        win = window.open(mypage,"video",settings)
+        }
+    </script>
+</body>
+
+</html>
