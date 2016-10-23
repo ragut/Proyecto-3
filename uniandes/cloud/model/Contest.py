@@ -47,12 +47,14 @@ class Contest():
         self.deadline = deadline
         self.description = description
 
+    def setId(self, id):
+        self.id = id
 
     def set_variables_db(self, dictionary):
         self.id = dictionary["id"]
         self.user_id = dictionary["user_id"]
         self.names = dictionary["name"]
-        self.banner = dictionary["baner"]
+        self.banner = dictionary["banner"]
         self.url = dictionary["url"]
         self.date_ini = dictionary["date_ini"]
         self.deadline = dictionary["deadline"]
@@ -75,9 +77,9 @@ class Contest():
             self.url = final_url
 
     def to_dict(self):
-        return {"id":self.id, "user_id":self.user_id, "name": self.name, "banner": self.banner,
+        return {"id":self.id, "user_id":self.user_id, "name": self.names, "banner": self.banner,
                 "url": self.url, "date_ini":self.date_ini, "deadline":self.deadline, "description":self.description}
 
     def to_save(self):
-        return {"id":self.id, "user_id":self.user_id, "name": self.name, "banner": self.banner,
+        return {"id":self.id, "user_id":self.user_id, "name": self.names, "banner": self.banner,
                 "url": self.url, "date_ini":self.date_ini, "deadline":self.deadline, "description":self.description}

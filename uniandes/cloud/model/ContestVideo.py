@@ -34,7 +34,8 @@ class ContestVideo():
         self.email = email
         self.video_name = video_name.replace(" ","_")
         self.date = time.strftime("%Y/%m/%d - %H:%M:%S")
-        self.video_name =self.date.replace("/","").replace(" - ","_").replace(":","")+"_"+self.user_id+"_"+self.contest_id + "_" + self.video_name
+        self.video_name =self.date.replace("/","").replace(" - ","_").replace(":","")+"_" + self.video_name
+        #self.video_name =self.date.replace("/","").replace(" - ","_").replace(":","")+"_"+self.user_id+"_"+self.contest_id + "_" + self.video_name
         self.names_user = names_user
         self.lastnames_user = lastnames_user
 

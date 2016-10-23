@@ -1,9 +1,11 @@
 from ..model.ContestVideo import ContestVideo
-from .FileController import FileController
+from .TemporalFileService import TemporalFileService
+import os
 
 #-----  AWS ------#
 from ..aws.DynamoDB import DynamoDB
 from ..aws.SQS import SQS
+from ..aws.S3 import S3
 
 class VideoController():
 
@@ -12,19 +14,26 @@ class VideoController():
 #-----  AWS ------#
     dynamoDB = None
     sqs = None
+    s3 = None
 
     def __init__(self):
-        self.fileSystem = FileController()
     #-----  AWS ------#
         self.dynamoDB = DynamoDB()
         self.sqs = SQS()
+        self.s3 = S3()
 
 #//----     CREA EL VIDEO   -----//
     def createVideo(self, user_id, contest_id, name_video, email, names_user, lastnames_user, videoFile, extension):
         video = ContestVideo()
         video.set_variables_video(user_id,contest_id, name_video, email, names_user, lastnames_user, "On Process", extension)
-        self.fileSystem.save_original_video(videoFile, video.video_name, video.original_file)
+
+    #------ VIDEO TEMPORAL ------//
+        path = os.path.join(TemporalFileService().url_original,video.video_name+"."+video.original_file)
+        fileObj = open(path, 'wb')
+        fileObj.write(videoFile)
+        fileObj.close()
     #-----  AWS ------#
+        self.s3.save_original(TemporalFileService().url_original,video.video_name+"."+video.original_file)
         self.sqs.send_message_to_process(video.id)
 
         return self.dynamoDB.createVideo(video)

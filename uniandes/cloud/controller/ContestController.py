@@ -1,8 +1,8 @@
-from ..model.Contest import Contest
-from .VideoController import VideoController
+from .TemporalFileService import TemporalFileService
 from .ImageService import ImageService
-from .FileController import FileController
-from ..filesystems.Filesystem import Filesystem
+from .VideoController import VideoController
+from ..model.Contest import Contest
+
 #-----  AWS ------#
 from ..aws.DynamoDB import DynamoDB
 from ..aws.S3 import S3
@@ -16,24 +16,23 @@ class ContestController():
     s3 = None
 
     def __init__(self):
-        self.fileSystem = FileController()
 
     #-----  AWS ------#
         self.dynamoDB = DynamoDB()
         self.s3 = S3()
+        self.image_service = ImageService()
 
 #//---- INSERTA CONCURSO    -----//
     def insertContest(self, user_id, names, date_ini, deadline, description, url, baner):
         contest = Contest()
         contest.set_variables_contest(user_id, names, date_ini, deadline, description, url)
 
-    #-----  GUARDA LA IMAGEN    ------#
-        img = ImageService().generate_img(baner)
-        img.save(Filesystem().ulr_banner+contest.banner,"png")
-        img.close()
+    #-----  IMAGEN TEMPORAL    ------#
+        img = self.image_service.generate_img(baner)
+        img.save(TemporalFileService().url_banner+contest.banner,"png")
 
     #-----  AWS -----#
-        self.s3.save_banner(Filesystem().ulr_banner,contest.banner)
+        self.s3.save_banner(TemporalFileService().url_banner,contest.banner)
         self.dynamoDB.createContest(contest)
 
         return contest
@@ -64,28 +63,32 @@ class ContestController():
     #//-----    OBTIENE CONCURSO ESPECIFICO ----//
     def getURLContest(self, contest_url):
         data = self.dynamoDB.getURLContest(contest_url)
-        contest = Contest()
-        contest.set_variables_db(data)
-        return contest
+        tmp_contest = None
+        if data is not None:
+            tmp_contest = Contest()
+            tmp_contest.set_variables_db(data)
+        return tmp_contest
 
 #//-----    ACTUALIZA CONCURSO ESPECIFICO ----//
     def updateContest(self, id, user_id,  name, date_ini, deadline, description, url, baner):
+        old_contest = self.dynamoDB.getContest(id)
+        self.s3.delete_banner(old_contest["banner"])
         contest = Contest()
         contest.set_variables_contest(user_id,  name, date_ini, deadline, description, url)
-        #contest.set_id(id)
+        contest.setId(id)
 
-    #-----  GUARDA LA IMAGEN    -----#
+    #-----  IMAGEN TEMPORAL    -----#
         img = ImageService().generate_img(baner)
-        img.save(Filesystem().ulr_banner+contest.banner,"png")
-        img.close()
+        img.save(TemporalFileService().url_banner+contest.banner,"png")
 
     #-----  AWS -----#
-        self.s3.save_banner(Filesystem().ulr_banner,contest.banner)
-
+        self.s3.save_banner(TemporalFileService().url_banner,contest.banner)
         return self.dynamoDB.updateContest(contest)
 
 #//-----    ELIMINA CONCURSO ESPECIFICO ----//
     def deleteContest(self, id):
         VideoController().deleteContestVideo(id)
+        old_contest = self.dynamoDB.getContest(id)
+        self.s3.delete_banner(old_contest["banner"])
         return self.dynamoDB.deleteContest(id)
 

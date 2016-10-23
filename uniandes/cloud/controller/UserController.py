@@ -1,7 +1,7 @@
 import base64
 
 from ..model.User import User
-from .FileController import FileController
+
 
 #-----  AWS ------#
 from ..aws.DynamoDB import DynamoDB
@@ -13,7 +13,6 @@ class UserController():
     dynamoDB = None
 
     def __init__(self):
-        self.fileSystem = FileController()
     #-----  AWS ------#
         self.dynamoDB = DynamoDB()
 
